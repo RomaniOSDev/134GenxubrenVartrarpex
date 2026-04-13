@@ -2,8 +2,7 @@
 //  ViewController.swift
 //  134GenxubrenVartrarpex
 //
-//  Created by Roman on 4/13/26.
-//
+
 
 import UIKit
 
