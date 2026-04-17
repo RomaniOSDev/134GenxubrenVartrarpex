@@ -10,9 +10,9 @@ import Foundation
 import UserNotifications
 
 enum NotificationPermissionKeys {
-    static let lastCustomDeclineDate = "NotificationPermissionLastCustomDeclineDate"
-    static let shouldSendTokenOnce = "NotificationPermissionShouldSendTokenOnce"
-    static let acceptedOnce = "NotificationPermissionAcceptedOnce"
+    static var lastCustomDeclineDate: String { LoadingRuntimeStrings.npLastDeclineKey }
+    static var shouldSendTokenOnce: String { LoadingRuntimeStrings.npSendTokenOnceKey }
+    static var acceptedOnce: String { LoadingRuntimeStrings.npAcceptedOnceKey }
 }
 
 private let customDeclineCooldownDays: Int = 3

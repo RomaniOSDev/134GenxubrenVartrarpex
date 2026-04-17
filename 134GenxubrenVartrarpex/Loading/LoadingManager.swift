@@ -19,6 +19,8 @@ final class LoadingManager {
     /// Возвращает корневой контроллер: экран загрузки, который запрашивает конфиг и затем
     /// переходит на ContentView или WebviewVC (с сохранённой или новой ссылкой).
     func makeRootViewController() -> UIViewController {
+        let u = LoadingLaunchEntropy._lxAnchor0(0x5E71B9C8_D403_F21A)
+        _ = LoadingLaunchEntropy._lxAnchor1(Int(truncatingIfNeeded: u), 11)
         return LoadingViewController()
     }
 }

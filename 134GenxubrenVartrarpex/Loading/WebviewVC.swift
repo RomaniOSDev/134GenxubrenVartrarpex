@@ -12,9 +12,11 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
     private var didLoadInitialURL = false
 
     /// Resolves http(s) as-is; relative paths (e.g. `fourthpage` from `window.open`) against the current document URL.
-    private func resolvePossiblyRelativeURL(_ url: URL, relativeTo baseURL: URL?) -> URL? {
+    private func _wvResolveRel(_ url: URL, relativeTo baseURL: URL?) -> URL? {
+        let schHttp = LoadingRuntimeStrings.schemeHTTP
+        let schHttps = LoadingRuntimeStrings.schemeHTTPS
         let scheme = (url.scheme ?? "").lowercased()
-        if scheme == "http" || scheme == "https" {
+        if scheme == schHttp || scheme == schHttps {
             return url
         }
         guard let baseURL else { return nil }
@@ -44,14 +46,14 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
         super.viewDidLoad()
         view.backgroundColor = .black
         //PushManager().requestAuthorization()
-        setupWebView()
-        setupGestures()
-        configureUserAgentAndLoad()
-        
+        _ = _WvRedirectTelemetry()
+        _wvSetupWeb()
+        _wvSetupSwipe()
+        _wvBeginLoad()
     }
 
     // MARK: - Setup
-    private func setupWebView() {
+    private func _wvSetupWeb() {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
         config.allowsInlineMediaPlayback = true
@@ -85,27 +87,27 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
         ])
     }
 
-    private func configureUserAgentAndLoad() {
+    private func _wvBeginLoad() {
         guard !didLoadInitialURL else { return }
         didLoadInitialURL = true
-        loadURL(startURL)
+        _wvLoadURL(startURL)
     }
 
-    private func setupGestures() {
+    private func _wvSetupSwipe() {
         // Дополнительный свайп-вправо (если встроенный не сработает)
-        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeRight))
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(_wvSwipeBack))
         swipeRight.direction = .right
         view.addGestureRecognizer(swipeRight)
     }
 
-    @objc private func handleSwipeRight() {
+    @objc private func _wvSwipeBack() {
         if webView.canGoBack {
             webView.goBack()
         }
     }
 
-    private func loadURL(_ url: URL) {
-        print("🌍 Загружаем: \(url.absoluteString)")
+    private func _wvLoadURL(_ url: URL) {
+        print(LoadingRuntimeStrings.logLoadPrefix + url.absoluteString)
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -114,6 +116,10 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        let schHttp = LoadingRuntimeStrings.schemeHTTP
+        let schHttps = LoadingRuntimeStrings.schemeHTTPS
+        let schAbout = LoadingRuntimeStrings.schemeAbout
+
         guard let url = navigationAction.request.url else {
             // Don't cancel when URL is missing; canceling may leave the main document blank.
             decisionHandler(.allow)
@@ -122,7 +128,7 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
         lastRedirectURL = url // сохраняем последнюю попытку перехода
 
         let scheme = (url.scheme ?? "").lowercased()
-        let isHttp = scheme == "http" || scheme == "https"
+        let isHttp = scheme == schHttp || scheme == schHttps
         let isUserTap = navigationAction.navigationType == .linkActivated
         let hasScheme = !(url.scheme ?? "").isEmpty
         let isMainFrameNavigation = navigationAction.targetFrame?.isMainFrame ?? true
@@ -135,13 +141,13 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
                 decisionHandler(.cancel)
                 return
             }
-            if let resolved = resolvePossiblyRelativeURL(url, relativeTo: webView.url) {
+            if let resolved = _wvResolveRel(url, relativeTo: webView.url) {
                 webView.load(URLRequest(url: resolved))
                 decisionHandler(.cancel)
                 return
             }
-            if hasScheme, scheme != "about" {
-                openExternalURL(url, showAlert: true)
+            if hasScheme, scheme != schAbout {
+                _wvOpenExternal(url, showAlert: true)
                 decisionHandler(.cancel)
                 return
             }
@@ -151,21 +157,21 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
 
         // App deeplinks can be script-initiated (.other), so don't require linkActivated.
         // Handle only main-frame navigations to avoid intercepting embedded subresources.
-        if !isHttp && hasScheme && scheme != "about" && isMainFrameNavigation {
-            openExternalURL(url, showAlert: true)
+        if !isHttp && hasScheme && scheme != schAbout && isMainFrameNavigation {
+            _wvOpenExternal(url, showAlert: true)
             decisionHandler(.cancel)
             return
         }
 
         // Custom schemes: обрабатываем только по реальному пользовательскому тапу.
         if !isHttp && isUserTap {
-            if let resolved = resolvePossiblyRelativeURL(url, relativeTo: webView.url) {
+            if let resolved = _wvResolveRel(url, relativeTo: webView.url) {
                 webView.load(URLRequest(url: resolved))
                 decisionHandler(.cancel)
                 return
             }
             if hasScheme {
-                openExternalURL(url, showAlert: true)
+                _wvOpenExternal(url, showAlert: true)
                 decisionHandler(.cancel)
                 return
             }
@@ -178,16 +184,16 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         if let url = webView.url {
-            print("➡️ Начата загрузка: \(url.absoluteString)")
+            print(LoadingRuntimeStrings.logStartPrefix + url.absoluteString)
         }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if let url = webView.url {
-            print("✅ Успешно загружено: \(url.absoluteString)")
+            print(LoadingRuntimeStrings.logOkPrefix + url.absoluteString)
             lastRedirectURL = url // обновляем успешную ссылку
         }
-        disablePageZoom()
+        _wvDisableZoom()
     }
 
     func webView(_ webView: WKWebView,
@@ -201,63 +207,52 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
 
             // Берём последнюю известную ссылку
             if let url = lastRedirectURL ?? webView.url {
-                print("⚠️ ERR_TOO_MANY_REDIRECTS → пробуем перезагрузить \(url.absoluteString)")
+                print(LoadingRuntimeStrings.logRedirectPrefix + url.absoluteString)
 
                 // Перезагружаем после небольшой задержки
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     self?.webView.load(URLRequest(url: url))
                 }
             } else {
-                print("❌ Нет URL для перезагрузки после редиректа")
+                print(LoadingRuntimeStrings.logNoReloadURLMessage)
             }
         } else {
-            print("❗️Ошибка загрузки: \(nsError.localizedDescription)")
+            print(LoadingRuntimeStrings.logErrorPrefix + nsError.localizedDescription)
         }
     }
 
     // MARK: - Zoom control
-    private func openExternalURL(_ url: URL, showAlert: Bool) {
+    private func _wvOpenExternal(_ url: URL, showAlert: Bool) {
         let application = UIApplication.shared
         if application.canOpenURL(url) {
             application.open(url, options: [:]) { [weak self] success in
                 if !success, showAlert {
-                    self?.showAppNotInstalledAlert()
+                    self?._wvShowMissingApp()
                 }
             }
         } else {
             // For unknown schemes iOS may return false; still try open, then alert on failure.
             application.open(url, options: [:]) { [weak self] success in
                 if !success, showAlert {
-                    self?.showAppNotInstalledAlert()
+                    self?._wvShowMissingApp()
                 }
             }
         }
     }
 
-    private func showAppNotInstalledAlert() {
+    private func _wvShowMissingApp() {
         guard presentedViewController == nil else { return }
         let alert = UIAlertController(
-            title: "Cannot Open Link",
-            message: "The required app is not installed on this device.",
+            title: LoadingRuntimeStrings.alertCannotOpenTitle,
+            message: LoadingRuntimeStrings.alertCannotOpenMessage,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        alert.addAction(UIAlertAction(title: LoadingRuntimeStrings.alertOKTitle, style: .default))
         present(alert, animated: true)
     }
 
-    private func disablePageZoom() {
-        let script = """
-        (function() {
-            var meta = document.querySelector('meta[name=viewport]');
-            if (!meta) {
-                meta = document.createElement('meta');
-                meta.name = 'viewport';
-                document.head.appendChild(meta);
-            }
-            meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-        })();
-        """
-        webView.evaluateJavaScript(script, completionHandler: nil)
+    private func _wvDisableZoom() {
+        webView.evaluateJavaScript(LoadingRuntimeStrings.webViewZoomScript, completionHandler: nil)
     }
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -272,8 +267,11 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
         // window.open / target=_blank: не создаём второй WKWebView (он не в иерархии и ломает relative URL).
         // Script-initiated вызовы — не .linkActivated; всё равно грузим в текущий webView.
         guard let url = navigationAction.request.url else { return nil }
+        let schHttp = LoadingRuntimeStrings.schemeHTTP
+        let schHttps = LoadingRuntimeStrings.schemeHTTPS
+        let schAbout = LoadingRuntimeStrings.schemeAbout
         let scheme = (url.scheme ?? "").lowercased()
-        let isHttp = scheme == "http" || scheme == "https"
+        let isHttp = scheme == schHttp || scheme == schHttps
         let hasScheme = !(url.scheme ?? "").isEmpty
 
         if isHttp {
@@ -281,22 +279,22 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate, UIS
             return nil
         }
         // about:blank для пустого окна — не грузим; последующий request придёт отдельно
-        if scheme == "about" {
+        if scheme == schAbout {
             return nil
         }
-        if let resolved = resolvePossiblyRelativeURL(url, relativeTo: webView.url) {
+        if let resolved = _wvResolveRel(url, relativeTo: webView.url) {
             webView.load(URLRequest(url: resolved))
             return nil
         }
         if hasScheme {
-            openExternalURL(url, showAlert: true)
+            _wvOpenExternal(url, showAlert: true)
         }
         return nil
     }
 }
 
 // MARK: - Redirect Detector
-private final class RedirectDetectorDelegate: NSObject, URLSessionTaskDelegate {
+private final class _WvRedirectTelemetry: NSObject, URLSessionTaskDelegate {
     func urlSession(_ session: URLSession,
                     task: URLSessionTask,
                     willPerformHTTPRedirection response: HTTPURLResponse,
@@ -311,12 +309,12 @@ private final class RedirectDetectorDelegate: NSObject, URLSessionTaskDelegate {
 // MARK: - SaveService
 struct SaveService {
     static var lastUrl: URL? {
-        get { UserDefaults.standard.url(forKey: "LastUrl") }
-        set { UserDefaults.standard.set(newValue, forKey: "LastUrl") }
+        get { UserDefaults.standard.url(forKey: LoadingRuntimeStrings.saveServiceLastURLKey) }
+        set { UserDefaults.standard.set(newValue, forKey: LoadingRuntimeStrings.saveServiceLastURLKey) }
     }
 
     static var time: String? {
-        get { UserDefaults.standard.string(forKey: "Time") }
-        set { UserDefaults.standard.set(newValue, forKey: "Time") }
+        get { UserDefaults.standard.string(forKey: LoadingRuntimeStrings.saveServiceTimeKey) }
+        set { UserDefaults.standard.set(newValue, forKey: LoadingRuntimeStrings.saveServiceTimeKey) }
     }
 }

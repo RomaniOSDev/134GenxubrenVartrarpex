@@ -19,8 +19,8 @@ struct ConfigResponse {
 
 /// Ключи для сохранения url и expires
 enum ConfigManagerKeys {
-    static let savedURL = "ConfigManagerSavedURL"
-    static let savedExpires = "ConfigManagerSavedExpires"
+    static var savedURL: String { LoadingRuntimeStrings.configSavedURLKey }
+    static var savedExpires: String { LoadingRuntimeStrings.configSavedExpiresKey }
 }
 
 /// Провайдер опциональных данных (Firebase). Установите из AppDelegate при инициализации Firebase.
@@ -35,10 +35,10 @@ final class ConfigManager {
     static let shared = ConfigManager()
 
     /// URL эндпоинта конфига.
-    var configEndpointURL: URL? = URL(string: "https://genxubrenvartrarpex.com/config.php")
+    var configEndpointURL: URL? = URL(string: LoadingRuntimeStrings.configEndpointURLString)
 
-    /// Store ID приложения (iOS — с префиксом "id"). 
-    var storeId: String = "id6762124114"
+    /// Store ID приложения (iOS — с префиксом "id").
+    var storeId: String = LoadingRuntimeStrings.storeIdValue
 
     private init() {}
 
@@ -85,27 +85,36 @@ final class ConfigManager {
             }
         }
 
+        let kAf = LoadingRuntimeStrings.bodyKeyAfId
+        let kBundle = LoadingRuntimeStrings.bodyKeyBundleId
+        let kOs = LoadingRuntimeStrings.bodyKeyOS
+        let kStore = LoadingRuntimeStrings.bodyKeyStoreId
+        let kLocale = LoadingRuntimeStrings.bodyKeyLocale
+        let kPush = LoadingRuntimeStrings.bodyKeyPushToken
+        let kFb = LoadingRuntimeStrings.bodyKeyFirebaseProjectId
+        let vIos = LoadingRuntimeStrings.bodyValueIOS
+
         // Дополнительные параметры (не перезаписываем существующие ключи из конверсии)
-        if body["af_id"] == nil {
-            body["af_id"] = AppsFlyerLib.shared().getAppsFlyerUID()
+        if body[kAf] == nil {
+            body[kAf] = AppsFlyerLib.shared().getAppsFlyerUID()
         }
-        if body["bundle_id"] == nil {
-            body["bundle_id"] = Bundle.main.bundleIdentifier ?? ""
+        if body[kBundle] == nil {
+            body[kBundle] = Bundle.main.bundleIdentifier ?? ""
         }
-        if body["os"] == nil {
-            body["os"] = "iOS"
+        if body[kOs] == nil {
+            body[kOs] = vIos
         }
-        if body["store_id"] == nil {
-            body["store_id"] = storeId
+        if body[kStore] == nil {
+            body[kStore] = storeId
         }
-        if body["locale"] == nil {
-            body["locale"] = Locale.current.identifier
+        if body[kLocale] == nil {
+            body[kLocale] = Locale.current.identifier
         }
-        if let token = ConfigManagerOptionalData.pushToken, body["push_token"] == nil {
-            body["push_token"] = token
+        if let token = ConfigManagerOptionalData.pushToken, body[kPush] == nil {
+            body[kPush] = token
         }
-        if let projectId = ConfigManagerOptionalData.firebaseProjectId, body["firebase_project_id"] == nil {
-            body["firebase_project_id"] = projectId
+        if let projectId = ConfigManagerOptionalData.firebaseProjectId, body[kFb] == nil {
+            body[kFb] = projectId
         }
 
         return try? JSONSerialization.data(withJSONObject: body)
@@ -125,8 +134,8 @@ final class ConfigManager {
         }
 
         var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = LoadingRuntimeStrings.httpMethodPOST
+        request.setValue(LoadingRuntimeStrings.mimeApplicationJSON, forHTTPHeaderField: LoadingRuntimeStrings.httpHeaderContentType)
         request.httpBody = body
         request.timeoutInterval = 10
 
@@ -161,14 +170,17 @@ final class ConfigManager {
         var url: String?
         var expires: Int64?
         var message: String?
+        let jkUrl = LoadingRuntimeStrings.jsonURLKey
+        let jkExp = LoadingRuntimeStrings.jsonExpiresKey
+        let jkMsg = LoadingRuntimeStrings.jsonMessageKey
         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-            url = json["url"] as? String
-            if let e = json["expires"] as? Int64 {
+            url = json[jkUrl] as? String
+            if let e = json[jkExp] as? Int64 {
                 expires = e
-            } else if let e = json["expires"] as? Int {
+            } else if let e = json[jkExp] as? Int {
                 expires = Int64(e)
             }
-            message = json["message"] as? String
+            message = json[jkMsg] as? String
         }
         return .success(ConfigResponse(ok: ok, url: url, expires: expires, message: message))
     }
@@ -180,9 +192,9 @@ enum ConfigError: LocalizedError {
     case invalidResponse
     var errorDescription: String? {
         switch self {
-        case .missingEndpoint: return "Config endpoint URL not set"
-        case .failedToBuildBody: return "Failed to build request body"
-        case .invalidResponse: return "Invalid config response"
+        case .missingEndpoint: return LoadingRuntimeStrings.errMissingEndpoint
+        case .failedToBuildBody: return LoadingRuntimeStrings.errFailedBody
+        case .invalidResponse: return LoadingRuntimeStrings.errInvalidResponse
         }
     }
 }

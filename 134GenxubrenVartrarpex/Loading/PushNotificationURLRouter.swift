@@ -28,34 +28,40 @@ final class PushNotificationURLRouter {
     /// - { "data": { "url": "https://..." } }
     /// - { "message": { "data": { "url": "https://..." } } } (FCM HTTP v1 example shape)
     func extractURL(from userInfo: [AnyHashable: Any]) -> URL? {
+        let kUrl = LoadingRuntimeStrings.pushPayloadURLKey
+        let kData = LoadingRuntimeStrings.pushPayloadDataKey
+        let kMsg = LoadingRuntimeStrings.pushPayloadMessageKey
+        let kGcm = LoadingRuntimeStrings.pushPayloadGcmURLKey
+        let kCustom = LoadingRuntimeStrings.pushPayloadCustomURLKey
+
         // 1) Top-level: { "url": "https://..." }
-        if let url = parseURL(from: userInfo, key: "url") { return url }
+        if let url = _puParseURL(from: userInfo, key: kUrl) { return url }
 
         // 2) Top-level: { "data": { "url": "https://..." } }
-        if let dataDict = userInfo["data"] as? [AnyHashable: Any],
-           let url = parseURL(from: dataDict, key: "url") {
+        if let dataDict = userInfo[kData] as? [AnyHashable: Any],
+           let url = _puParseURL(from: dataDict, key: kUrl) {
             return url
         }
 
         // 3) FCM HTTP v1 example shape: { "message": { "data": { "url": "https://..." } } }
-        if let messageDict = userInfo["message"] as? [AnyHashable: Any] {
+        if let messageDict = userInfo[kMsg] as? [AnyHashable: Any] {
             // { "message": { "url": "..." } } (rare but harmless)
-            if let url = parseURL(from: messageDict, key: "url") { return url }
+            if let url = _puParseURL(from: messageDict, key: kUrl) { return url }
 
-            if let messageDataDict = messageDict["data"] as? [AnyHashable: Any],
-               let url = parseURL(from: messageDataDict, key: "url") {
+            if let messageDataDict = messageDict[kData] as? [AnyHashable: Any],
+               let url = _puParseURL(from: messageDataDict, key: kUrl) {
                 return url
             }
         }
 
         // 4) Common string-key variants (some providers flatten custom keys)
-        if let url = parseURL(from: userInfo, key: "gcm.notification.url") { return url }
-        if let url = parseURL(from: userInfo, key: "custom.url") { return url }
+        if let url = _puParseURL(from: userInfo, key: kGcm) { return url }
+        if let url = _puParseURL(from: userInfo, key: kCustom) { return url }
 
         return nil
     }
 
-    private func parseURL(from dict: [AnyHashable: Any], key: String) -> URL? {
+    private func _puParseURL(from dict: [AnyHashable: Any], key: String) -> URL? {
         guard let raw = dict[key] else { return nil }
         let urlString: String?
         if let s = raw as? String { urlString = s }

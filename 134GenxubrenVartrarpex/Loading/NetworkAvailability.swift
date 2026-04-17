@@ -11,7 +11,7 @@ import Network
 enum NetworkAvailability {
     static func checkConnection(completion: @escaping (Bool) -> Void) {
         let monitor = NWPathMonitor()
-        let queue = DispatchQueue(label: "network.availability.check")
+        let queue = DispatchQueue(label: LoadingRuntimeStrings.networkMonitorQueueLabel)
         var completed = false
 
         func finish(_ connected: Bool) {

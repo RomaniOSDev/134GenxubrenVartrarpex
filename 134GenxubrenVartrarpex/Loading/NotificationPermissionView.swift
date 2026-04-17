@@ -61,11 +61,11 @@ struct NotificationPermissionView: View {
 
     private var textSection: some View {
         VStack(spacing: 12) {
-            Text("Enable Notifications")
+            Text(LoadingRuntimeStrings.npScreenTitle)
                 .font(.system(size: 22, weight: .semibold, design: .default))
                 .foregroundColor(.appTextPrimary)
                 .multilineTextAlignment(.center)
-            Text("Stay updated with important news and offers. You can change this later in Settings.")
+            Text(LoadingRuntimeStrings.npScreenBody)
                 .font(.system(size: 16, weight: .regular, design: .default))
                 .foregroundColor(.appTextSecondary)
                 .multilineTextAlignment(.center)
@@ -75,7 +75,7 @@ struct NotificationPermissionView: View {
     private var buttonsSection: some View {
         VStack(spacing: 14) {
             Button(action: onAccept) {
-                Text("Enable")
+                Text(LoadingRuntimeStrings.npEnableButton)
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -86,7 +86,7 @@ struct NotificationPermissionView: View {
             .buttonStyle(.plain)
 
             Button(action: onDecline) {
-                Text("Not Now")
+                Text(LoadingRuntimeStrings.npNotNowButton)
                     .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.appTextSecondary)
             }

@@ -19,22 +19,26 @@ enum UserAgentBuilder {
         let model = device.model
         let platform: String
         let cpuPart: String
-        if model.hasPrefix("iPad") {
-            platform = "iPad"
-            cpuPart = "CPU OS \(osVersionUnderscore)"
-        } else if model.hasPrefix("iPod") {
-            platform = "iPod touch"
-            cpuPart = "CPU iPhone OS \(osVersionUnderscore)"
+        let tokPad = LoadingRuntimeStrings.uaIPadToken
+        let tokPod = LoadingRuntimeStrings.uaIPodToken
+        let podLinePrefix = LoadingRuntimeStrings.uaIPodLinePrefix
+        if model.hasPrefix(tokPad) {
+            platform = tokPad
+            cpuPart = LoadingRuntimeStrings.uaCPUOSIPadFragment + osVersionUnderscore
+        } else if model.hasPrefix(podLinePrefix) {
+            platform = tokPod
+            cpuPart = LoadingRuntimeStrings.uaCPUOSPhoneFragment + osVersionUnderscore
         } else {
-            platform = "iPhone"
-            cpuPart = "CPU iPhone OS \(osVersionUnderscore)"
+            platform = LoadingRuntimeStrings.uaIPhoneToken
+            cpuPart = LoadingRuntimeStrings.uaCPUOSPhoneFragment + osVersionUnderscore
         }
 
+        let sep = LoadingRuntimeStrings.uaJoinSeparator
         return [
-            "Mozilla/5.0 (\(platform); \(cpuPart) like Mac OS X)",
-            "AppleWebKit/605.1.15 (KHTML, like Gecko)",
-            "Version/\(osVersion)",
-            "Safari/604.1"
-        ].joined(separator: " ")
+            LoadingRuntimeStrings.uaMozillaPrefix + platform + "; " + cpuPart + LoadingRuntimeStrings.uaLikeMacOSXSuffix,
+            LoadingRuntimeStrings.uaWebKitFragment,
+            LoadingRuntimeStrings.uaVersionPrefix + osVersion,
+            LoadingRuntimeStrings.uaSafariSuffix
+        ].joined(separator: sep)
     }
 }

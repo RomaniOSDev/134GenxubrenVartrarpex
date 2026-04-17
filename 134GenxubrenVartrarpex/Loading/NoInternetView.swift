@@ -26,12 +26,12 @@ struct NoInternetView: View {
                     .font(.system(size: 52, weight: .semibold))
                     .foregroundColor(.appPrimary)
 
-                Text("No Internet Connection")
+                Text(LoadingRuntimeStrings.noInternetTitle)
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(.appTextPrimary)
                     .multilineTextAlignment(.center)
 
-                Text("Please check your connection and try again.")
+                Text(LoadingRuntimeStrings.noInternetBody)
                     .font(.system(size: 16, weight: .regular))
                     .foregroundColor(.appTextSecondary)
                     .multilineTextAlignment(.center)
@@ -41,7 +41,7 @@ struct NoInternetView: View {
 
                 VStack(spacing: 12) {
                     Button(action: onRetry) {
-                        Text("Retry")
+                        Text(LoadingRuntimeStrings.noInternetRetry)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
