@@ -50,14 +50,14 @@
 		30EED6D82F921A1100B54138 /* NotificationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EED6C72F921A1100B54138 /* NotificationPermissionManager.swift */; };
 		30EED6D92F921A1100B54138 /* NotificationPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EED6C92F921A1100B54138 /* NotificationPermissionViewController.swift */; };
 		30EED6DA2F921A1100B54138 /* LoadingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EED6C22F921A1100B54138 /* LoadingManager.swift */; };
-		30F0A1032F92300000B54138 /* LoadingLaunchEntropy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F0A1012F92300000B54138 /* LoadingLaunchEntropy.swift */; };
-		30F0A1042F92300000B54138 /* LoadingRuntimeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F0A1022F92300000B54138 /* LoadingRuntimeStrings.swift */; };
 		30EED6E62F921A2400B54138 /* NotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 30EED6DF2F921A2400B54138 /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		30EED6EE2F921AEB00B54138 /* AppsFlyerLib-Static in Frameworks */ = {isa = PBXBuildFile; productRef = 30EED6ED2F921AEB00B54138 /* AppsFlyerLib-Static */; };
 		30EED6F12F921B5800B54138 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 30EED6F02F921B5800B54138 /* FirebaseMessaging */; };
 		30EED6F32F921B6700B54138 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 30EED6F22F921B6700B54138 /* FirebaseMessaging */; };
 		30EED6F82F921E4800B54138 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EED6F52F921E4800B54138 /* NotificationService.swift */; };
 		30EED6FB2F921F5600B54138 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 30EED6FA2F921F5600B54138 /* GoogleService-Info.plist */; };
+		30F0A1032F92300000B54138 /* LoadingLaunchEntropy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F0A1012F92300000B54138 /* LoadingLaunchEntropy.swift */; };
+		30F0A1042F92300000B54138 /* LoadingRuntimeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F0A1022F92300000B54138 /* LoadingRuntimeStrings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,13 +132,13 @@
 		30EED6CA2F921A1100B54138 /* PushNotificationURLRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationURLRouter.swift; sourceTree = "<group>"; };
 		30EED6CB2F921A1100B54138 /* UserAgentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentBuilder.swift; sourceTree = "<group>"; };
 		30EED6CC2F921A1100B54138 /* WebviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebviewVC.swift; sourceTree = "<group>"; };
-		30F0A1012F92300000B54138 /* LoadingLaunchEntropy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingLaunchEntropy.swift; sourceTree = "<group>"; };
-		30F0A1022F92300000B54138 /* LoadingRuntimeStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingRuntimeStrings.swift; sourceTree = "<group>"; };
 		30EED6DF2F921A2400B54138 /* NotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		30EED6F42F921E4800B54138 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		30EED6F52F921E4800B54138 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		30EED6F92F921E7400B54138 /* 134GenxubrenVartrarpex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = 134GenxubrenVartrarpex.entitlements; sourceTree = "<group>"; };
 		30EED6FA2F921F5600B54138 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		30F0A1012F92300000B54138 /* LoadingLaunchEntropy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingLaunchEntropy.swift; sourceTree = "<group>"; };
+		30F0A1022F92300000B54138 /* LoadingRuntimeStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingRuntimeStrings.swift; sourceTree = "<group>"; };
 		4B25B7CFDC927AAF7B8DAEED /* Pods-134GenxubrenVartrarpex.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-134GenxubrenVartrarpex.release.xcconfig"; path = "Target Support Files/Pods-134GenxubrenVartrarpex/Pods-134GenxubrenVartrarpex.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -642,7 +642,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = 134GenxubrenVartrarpex/134GenxubrenVartrarpex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = 134GenxubrenVartrarpex/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Genxubren Vartrarpex";
@@ -683,7 +683,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = 134GenxubrenVartrarpex/134GenxubrenVartrarpex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = 134GenxubrenVartrarpex/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Genxubren Vartrarpex";
